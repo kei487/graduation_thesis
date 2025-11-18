@@ -1,0 +1,79 @@
+\documentclass[a4paper,11pt]{jsbook}
+
+\newcommand{\V}[1]{\boldsymbol{#1}}
+\def\thline{\noalign{\hrule height 1pt}}
+\def\tvline{\vrule width 1pt}
+
+\usepackage{here} %図の場所の指定で[H]（ここに貼る）を指定するためのパッケージ
+\usepackage{makeidx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[dvipdfmx]{graphicx} %dvipdfmxはjpgやpngの張り込みのために使用
+\usepackage{url}
+
+\makeindex
+
+\pagenumbering{roman}
+
+\begin{document}
+
+% 表紙
+\title{令和7年度 卒業論文 \\
+    自律移動ロボットのための価値反復と\\
+    A*探索を組み合わせた大域経路計画 \\
+}
+
+
+\author{中村啓太郎\\
+    China Institute of Technology}
+
+
+\date{2026年1月29日}
+
+\maketitle
+
+%%% 但し書き等 %%%
+% \clearpage
+
+%%% 献辞 %%%
+% D論, あるいは誰かを亡くしたときの卒論, 修論等で
+% 配偶者や配偶者の予定となる人の名前は覚悟をもって書くこと
+% \thispagestyle{empty}
+% \vfil
+% \ \\
+% \vspace{15em}
+% \begin{center}
+% 	{\Large 最愛の京成線に捧ぐ }
+% \end{center}
+% 献辞をかかない場合はここまでコメントアウト
+
+\include{preface}
+
+\tableofcontents
+
+%\cleardoublepage
+
+%%% 本文 %%%
+% 章のページの先頭は左側（奇数ページ）に来る
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\include{introduction}
+\include{problem}
+\include{method}
+\include{implement}
+\include{experiment}
+\include{conclusion}
+
+%%% 参考文献 %%%
+% よほどのことが無い限りet al.は使わないことにしましょう
+\bibliographystyle{jualpha}
+\bibliography{./references}
+
+% \newpage
+% \printindex
+
+\end{document}
+
+
