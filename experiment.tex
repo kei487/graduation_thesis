@@ -4,6 +4,71 @@
 \section{シミュレーター実験}
 %図\ref{fig:map}から作成した
 シミュレーターで実験した．
+千葉工業大学津田沼キャンパスで得られた
+地図を用いたシミュレーションで，提案手法を評価する．
+図?%\ref{fig:map_exp1}
+に，この地図を示す．
+紙面横方向が300m，縦方向が200mの6haの環境の地図で，
+形式は，ROSのナビゲーションスタックで用いられる
+占有格子地図である．
+白色が障害物のない画素，
+黒色が障害物のある画素,灰色が不明な画素を表す.
+この地図のパラメータは表\ref{tab:map_exp1}の通りである．
+
+シミュレータ内で走行させるロボットは，
+図?% \ref{fig:raspicat}
+に見られる差動二輪型のロボットである．
+実験に用いた計算機は，CPUとしてRyzen 9 7945HX3D（16コア32スレッド），
+DRAMとしてDDR5-4800 32GBが2枚（64GB）搭載されたものである．
+VIパッケージはマルチスレッド化されており，
+環境の全域で$V$を計算する大域計画器と，
+ロボットの周囲で$V$を計算する局所計画器に任意のスレッドの数
+を割り当てることができる．
+本稿の実験では，大域計画器に8，
+局所計画器に6のスレッドを割り当てた．
+A*は別のプロセスで動作する．
+CPUから見ると，A*には1つのスレッドを割くこととなる．
+また，シミュレーションにはGazebo
+（ROSの標準的なシミュレータ）を使用するので，
+これにも計算機のリソースを使うこととなる．
+
+\begin{table}[bt]
+    \centering
+    \caption{Configurations of the Map}
+    \label{tab:map_info}
+	\begin{small}
+    \begin{tabular}{l|l}
+        \hline
+        map size & 294.6[m]$\times$199.95[m] \\
+        cell resolution & 0.15[m]$\times$0.15[m] \\
+        number of cells & 2,615,346 \\
+        number of free cells & 165,076 \\
+        the area of the free cells & 3714.98[m$^2$] \\
+        \hline
+    \end{tabular}
+	\end{small}
+\end{table}
+
+% \begin{figure}[tbh]
+%     \centering
+%     \begin{minipage}{1 \linewidth}
+%         \centering
+%         \includegraphics[width=1 \linewidth]{figures/map.eps}
+%     \end{minipage}
+%     \caption{the Map for Navigation}
+%     \label{fig:map_exp1}
+% \end{figure}
+% 
+% 
+% \begin{figure}[tbh]
+%     \centering
+%     \begin{minipage}{1 \linewidth}
+%         \centering
+%         \includegraphics[width=0.8 \linewidth]{figures/raspicat.eps}
+%     \end{minipage}
+%     \caption{Simulated Rasberry Pi Cat}
+%     \label{fig:raspicat}
+% \end{figure}
 
 
 %\begin{figure}[hbt]
