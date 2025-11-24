@@ -21,6 +21,69 @@
 移動障害物が存在するが，これらは VI パッケージの既存の機能で対処可能である．
 しかし，本研究では移動障害物の回避は陽には扱わない．
 
+\subsection{マルコフ決定過程（Markov Decision Process: MDP）による定式化}
+
+MDPは，エージェントが環境と相互作用しながら学習・行動決定を行うための数理モデルであり，
+以下の4つの要素の組 
+$\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義される．
+
+\begin{enumerate}
+    \item \textbf{状態集合 $\mathcal{S}$ (State Space)}:
+    ロボットが取り得るすべての状態の集合．2次元グリッドマップ上での経路計画の場合，
+	各グリッドセル $(x, y)$ が一つの状態 $s \in \mathcal{S}$ に対応する．
+	さらに，ロボットの方位 $\theta$ を含めて $(x, y, \theta)$ を状態とすることもある．
+
+    \item \textbf{行動集合 $\mathcal{A}$ (Action Space)}:
+    各状態でロボットが選択可能な行動の集合．
+	グリッドマップ上では，隣接する8近傍（上下左右＋斜め）への移動や，
+	その場での停止などが行動 $a \in \mathcal{A}$ となる．
+
+    \item \textbf{遷移確率 $\mathcal{P}_a(s, s')$ (Transition Probability)}:
+    状態 $s$ で行動 $a$ を選択したときに，次の時刻に状態 $s'$ へ遷移する確率．
+    \begin{equation}
+        \mathcal{P}_a(s, s') = \Pr(S_{t+1}=s' \mid S_t=s, A_t=a)
+    \end{equation}
+    決定論的な環境（A*などが想定する世界）では，ある行動を行えば100\%意図した隣接セルへ移動する．
+	しかし実環境では，タイヤのスリップや制御誤差により，意図したセルへ移動できない場合がある．
+	MDPではこの不確実性を確率分布として明示的にモデル化できる．
+	例えば，「前進」を選択しても，10\%の確率で「横滑り」する，といった表現が可能である．
+
+    \item \textbf{報酬関数 $\mathcal{R}_a(s, s')$ (Reward Function)}:
+    状態遷移に伴って得られる即時報酬（またはコスト）．
+	経路計画問題においては，通常「コストの最小化」または「負の報酬の最大化」として定式化される．
+    例えば，ゴール状態に到達したときに大きな正の報酬を与え，
+	障害物に衝突したときに大きな負の報酬（ペナルティ）を与える．
+	また，移動にかかる時間やエネルギーを表現するため，
+	各ステップごとにわずかな負の報酬（ステップコスト）を与える．
+\end{enumerate}
+
+\subsubsection{ベルマン方程式と価値関数}
+MDPの目的は，各状態でどのような行動をとるべきかというルール，
+すなわち「方策（Policy） $\pi: \mathcal{S} \to \mathcal{A}$」を見つけることである．
+最適な方策 $\pi^*$ を見つけるために，「状態価値関数 $V^\pi(s)$」を導入する．
+これは，ある状態 $s$ からスタートし，方策 $\pi$ に従って行動し続けたときに
+得られる将来の報酬の総和（期待値）である．
+
+
+割引率を $\gamma$ ($0 \le \gamma < 1$) とすると，価値関数は以下のように定義される．
+\begin{equation}
+    V^\pi(s) = \mathbb{E} \left[ \sum_{t=0}^{\infty} \gamma^t R_{t+1} \mid S_0 = s, \pi \right]
+\end{equation}
+
+
+最適な方策 $\pi^*$ に従ったときの価値関数を最適状態価値関数 $V^*(s)$ と呼ぶ．
+$V^*(s)$ は，以下のベルマン最適方程式（Bellman Optimality Equation）を満たす．
+\begin{equation}
+    V^*(s) = \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
+	\mathcal{P}_a(s, s') \left[ \mathcal{R}_a(s, s') + \gamma V^*(s') \right]
+    \label{eq:bellman_opt}
+\end{equation}
+
+
+この方程式は再帰的な構造をしており，
+「ある状態の価値は，そこで最適な行動をとった際に期待される即時報酬と，
+遷移先の状態の価値の割引和によって決まる」ことを意味している．
+
 \section{価値反復}
 VIパッケージの価値反復で計算される式は，
 ロボットがある位置・向き
@@ -96,6 +159,36 @@ $V$の勾配は目的地の周辺からできはじめ，
 長く待たされることになる．
 価値反復アルゴリズムは，ベルマン方程式の形式に乗るように
 定式化することで，最適な状態価値関数を得られるアルゴリズムである．
+
+
+
+\subsection{価値反復アルゴリズム}
+ベルマン最適方程式 (\ref{eq:bellman_opt}) を用いて，
+反復計算により $V^*(s)$ を求める手法が価値反復法（Value Iteration）である．
+アルゴリズムの手順は以下の通りである．
+
+\begin{enumerate}
+    \item \textbf{初期化}: すべての状態 $s$ について，$V(s)$ を任意の値（通常は0）に初期化する．
+    \item \textbf{反復更新}: 以下の更新式を，すべての状態 $s$ に対して適用する．
+    \begin{equation}
+        V_{k+1}(s) \leftarrow \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
+	\mathcal{P}_a(s, s') \left[ \mathcal{R}_a(s, s') + \gamma V_k(s') \right]
+    \end{equation}
+    ここで $k$ は反復回数を表す．
+    \item \textbf{収束判定}: 全状態における価値関数の更新量 $|V_{k+1}(s) - V_k(s)|$ の最大値が，
+	事前に定めた閾値 $\epsilon$ 未満になれば停止する．
+    \item \textbf{方策抽出}: 収束した価値関数 $V^*(s)$ を用い，
+	各状態で価値を最大化する行動を選択する貪欲方策（Greedy Policy）を得る．
+    \begin{equation}
+        \pi^*(s) = \operatorname*{argmax}_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
+	\mathcal{P}_a(s, s') \left[ \mathcal{R}_a(s, s') + \gamma V^*(s') \right]
+    \end{equation}
+\end{enumerate}
+
+この計算により，環境内のあらゆる場所からゴールへ向かうための最適な「勾配」が得られる．
+これはポテンシャル場に似ているが，ポテンシャル法が抱える「局所解（Local Minima）」の問題
+（ゴール以外の窪みにハマって出られなくなる現象）が発生しないという強力な数学的保証がある．
+なぜなら，ベルマン方程式による更新は，大域的な最適性を伝播させる処理だからである．
 
 \section{経路探索アルゴリズム}
 
