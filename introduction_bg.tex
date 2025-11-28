@@ -142,12 +142,13 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 
 \begin{itemize}
     \item \textbf{LiDAR}: レーザー光を照射し，反射光が戻ってくるまでの時間（Time of Flight）
-	や位相差から距離を計測する．
-	北陽に代表される
-	2次元平面をスキャンする2D LiDARが主流であったが，
+	や位相差から距離を計測するセンサ．
+	北陽に代表される2次元平面をスキャンする2D LiDARが主流であったが，
 	近年では，HesaiやLivoxといった中国メーカーによる，
 	3次元点群を取得可能な3D LiDARの低価格化が進んでいる．
-    \item \textbf{カメラ}: RGB画像に加え，深度情報を取得できるRGB-Dカメラや
+    \item \textbf{カメラ}: 可視光線を計測し，
+	人の知覚する色の分布を捉えることができるセンサ．
+	RGB画像に加え，深度情報を取得できるRGB-Dカメラや
 	ステレオカメラが利用される．
 	Visual SLAMや物体認識との親和性が高い．
     \item \textbf{オドメトリ（Odometry）}: 車輪の回転数（エンコーダ値）や
@@ -163,15 +164,40 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 \end{itemize}
 
 \subsubsection{自己位置推定（Localization）技術}
-ロボット自身が今どこにいるかを計算する技術は，
-自律移動にとって欠かせない技術である．
-オドメトリの累積誤差を補正し，地図座標系上での絶対位置を特定するために，
+自己位置推定は，
+書いて字のごとく，ロボットがロボット自身の位置を推定する技術である．
+単に，自己位置推定といった場合は，
+各地点で環境から取得できる情報を記した地図
+を予めロボットが持っており，その地図上の自身の座標を推定することを指す．
+地図を持たない場合は，SLAM（Simultaneous Localization and Mapping）
+とよばれる．
+
+%SLAMよくわからない
+%友納先生がまとめてくださってる論文読んで書いた
+\paragraph{SLAM}
+SLAMはロボットがセンサ情報と制御入力だけで地図を作る技術である\cite{Thrun2005}．
+SLAMは，主に用いるセンサごとにLiDAR SLAMとVisual SLAMに大別される．
+それぞれのSLAMごとに，代表的な実装例を以下に示す\cite{友納2020}．
+\begin{itemize}
+    \item \textbf{LiDAR SLAM}: 
+	2D LiDARを用いたものでは，パーティクルフィルタベースのGMapping\cite{Brain2009gmapping}や
+	グラフベースのCartographer\cite{Damon2016cartographer}などがある．
+	3D LiDARでは，スキャンマッチングによるVelodyne SLAM\cite{Moosmann2011}や
+	LOAM\cite{Zhang2016}などがある．
+	近年の日本では，GLIM\cite{koide2024}がシェアを伸ばしている\cite{原2025}．
+    \item \textbf{Visual SLAM}: 
+	カメラ画像の特徴点を用いるORB-SLAM\cite{Raul2015}や，
+	直接法と呼ばれる密な点群を用いるLSD-SLAM\cite{Engel2014}などがある．
+\end{itemize}
+
+%自己位置推定の手法まだまだいっぱいあるよなー
+%網羅的でないからいい感じに範囲狭めないと怪しい気がする
+\paragraph{地図あり自己位置推定（Map Based Localization: MBL）}
+オドメトリの累積誤差を補正し，
+地図座標系上での絶対位置を特定するために，
 様々な手法が開発されてきた．
-
-
-\paragraph{確率的ロボティクスの枠組み}
 1990年代以降，Thrunらによって提唱された
-確率的ロボティクス（Probabilistic Robotics）\cite{thrun2005}は，
+確率的ロボティクス（Probabilistic Robotics）\cite{Thrun2005}は，
 センサのノイズや環境の不確実性を確率分布として扱うことで，ロバストな自己位置推定を可能にした．
 代表的な手法として，（拡張）カルマンフィルタと
 パーティクルフィルタ（Particle Filter）がある．
@@ -183,40 +209,23 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 MCLは，ロバスト性において他の手法より優れており，
 現在のAMRのデファクトスタンダードとなっている．
 
-%\dummyfig{パーティクルフィルタによる位置推定の概念図}{4cm}
-
-\paragraph{SLAM (Simultaneous Localization and Mapping)}
-地図を持たない未知の環境においては，自己位置推定と同時に環境地図の作成を行うSLAM技術が用いられる．
-\begin{itemize}
-    \item \textbf{LiDAR SLAM}: GMapping\cite{Brain2009gmapping}やCartographer\cite{Damon2016cartographer}など，
-	レーザーレンジファインダを用いたグリッドマップ生成手法．
-  GLIM\cite{koide2024}に代表されるGraph-based SLAMと呼ばれる手法は，
-  ロボットの姿勢（ノード）と観測制約（エッジ）をグラフ構造として表現し，
-  非線形最小二乗法によって全体最適化を行うもの．
-    \item \textbf{Visual SLAM}: ORB-SLAM\cite{Raul2015}など，カメラ画像の特徴点を用いて
-	疎な地図（Feature Map）を作成する．テクスチャの豊富な環境に強い．
-\end{itemize}
-
-
-\paragraph{経路計画（Path Planning）技術}
 自己位置推定技術の成熟により，
 ロボットは環境内での自身の位置を推定できるようになった．
 また，SLAM技術により，障害物の配置や通行可能な領域を表す
 環境の地図を作成することも可能となった．
 
 
+\subsubsection{経路計画（Path Planning）技術}
 ロボットが実際にタスクを遂行するためには，自己位置推定だけでなく，
 現在地（Start）から目的地（Goal）まで，
 障害物を回避しつつ，かつ効率的（最短時間，最小エネルギーなど）
 に到達するための軌道を決定しなければならない．
-
 
 経路計画は，自己位置推定の結果と環境地図，目的地を入力とし，
 ロボットのアクチュエータ（モータ）への制御指令を出力とする，
 自己位置推定がいかに正確なものであっても，
 経路計画が不適切であれば，ロボットは遠回りをするか，
 狭い通路で立ち往生するか，最悪の場合は動的障害物と衝突する危険性がある．
-
 
 前章で述べたように，社会実装が進むにつれて，ロボットが稼働する環境はより複雑化している．
 静的な障害物だけでなく，人や他のロボットが移動する動的環境や，
