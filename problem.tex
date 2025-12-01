@@ -1,25 +1,43 @@
 \chapter{移動ロボットの経路計画問題}\label{chap:problem}
 
-\section{扱う問題}
+\section{問題設定}\label{sec:prob_def}
 本研究では，移動ロボットを平面上で自律移動させる問題を扱う．
-広く用いられている Nav2[?]%\cite{}] 
-(ROS 2 の標準ナビゲーションパッケージ)が扱う問題と同様の
-問題である．
+これは，ROS 2\cite{ROS2}で広く用いられているNavigation2\cite{Navigation2}
+（ROS 2 の標準ナビゲーションパッケージ）が扱う問題と同様の問題である．
 ロボットは，行動を始めるタイミングで目的地の座標を与えられ，
 障害物との衝突を避けながらできる限り短い時間で目的地まで
 到達しなければならない．
 ロボットが移動を行う空間を環境と言い，
-図2%\ref{fig:map}
-にその環境の例を示す．
+図\ref{fig:robot_env}にその環境の例を示す．
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{An enviroment for mobile robot navigation}
+  \label{fig:robot_env}
+\end{figure}
+
 環境には，世界座標系が 2 次元の直交座標系で設定されており，
-ロボットは，位置$(x, y)$と，$x$軸となす角$\theta$を向きとして
-持っており，これらをまとめてロボットの状態（位置と向き）$x = (x， y， \theta)$
-3 変数で表現される．
-目的地地点は図中の destination area のように $XY$
-平面上の領域や，$xy\theta$空間内の領域として与えられる．
-環境中には，その位置は既知である固定障害物と
-移動障害物が存在するが，これらは VI パッケージの既存の機能で対処可能である．
-しかし，本研究では移動障害物の回避は陽には扱わない．
+ロボットは，位置$(x, y)$と，$x$軸となす角$\theta$を向きとして持っている．
+これらをまとめてロボットの状態（位置と向き）$s = (x， y， \theta)$
+と，３つの変数で表す．
+
+目的地（ゴール）は，$XY$平面上の座標あるいは，
+$xy\theta$空間上の座標として与えられ，
+図中の destination area のように
+その座標を中心とした$XY$平面上の領域や，
+$xy\theta$空間内の領域として扱われる．
+実装によっては，任意の領域を目的地とすることができる．
+
+環境中には，地図に記されており
+その位置が既知である固定障害物と
+地図に記されない未知障害物が存在する，
+未知障害物のうち，特に
+ロボットが移動する時間スケールで
+位置が変わる人や他のロボットなどの移動障害物と呼ぶ．
+未知障害物は，価値反復ROSパッケージの既存の機能で対処可能である．
+しかし，本研究では，走り出しに関与する大域経路計画を扱うため，
+局所経路計画である未知障害物の回避は陽には扱わない．
 
 \subsection{マルコフ決定過程（Markov Decision Process: MDP）による定式化}
 
@@ -28,17 +46,19 @@ MDPは，エージェントが環境と相互作用しながら学習・行動�
 $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義される．
 
 \begin{enumerate}
-    \item \textbf{状態集合 $\mathcal{S}$ (State Space)}:
-    ロボットが取り得るすべての状態の集合．2次元グリッドマップ上での経路計画の場合，
-	各グリッドセル $(x, y)$ が一つの状態 $s \in \mathcal{S}$ に対応する．
-	さらに，ロボットの方位 $\theta$ を含めて $(x, y, \theta)$ を状態とすることもある．
+    \item \textbf{状態空間 $\mathcal{S}$ (State Space)}:
+    ロボットが取り得るすべての状態の集合．
+	\ref{sec:prob_def}章で述べたように，価値反復ROSパッケージでは，
+	各グリッドセル $(x, y)$ とロボットの方位$\theta$を合わせた
+	$(x, y, \theta)$を一つの状態 $s \in \mathcal{S}$ に対応する．
 
-    \item \textbf{行動集合 $\mathcal{A}$ (Action Space)}:
+    \item \textbf{行動の集合 $\mathcal{A}$ (Action Space)}:
     各状態でロボットが選択可能な行動の集合．
-	グリッドマップ上では，隣接する8近傍（上下左右＋斜め）への移動や，
-	その場での停止などが行動 $a \in \mathcal{A}$ となる．
+	価値反復ROSパッケージでは，速度$v$と角速度$\omega$の組で表される．
+	例えば直進であれば，$(v, \omega) = (0.3[m/s], 0[rad/s]), (0.2, 0.1)$
+	行動 $a \in \mathcal{A}$ となる．
 
-    \item \textbf{遷移確率 $\mathcal{P}_a(s, s')$ (Transition Probability)}:
+    \item \textbf{状態遷移モデル $\mathcal{P}_a(s, s')$ (Transition Probability)}:
     状態 $s$ で行動 $a$ を選択したときに，次の時刻に状態 $s'$ へ遷移する確率．
     \begin{equation}
         \mathcal{P}_a(s, s') = \Pr(S_{t+1}=s' \mid S_t=s, A_t=a)
@@ -48,7 +68,7 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
 	MDPではこの不確実性を確率分布として明示的にモデル化できる．
 	例えば，「前進」を選択しても，10\%の確率で「横滑り」する，といった表現が可能である．
 
-    \item \textbf{報酬関数 $\mathcal{R}_a(s, s')$ (Reward Function)}:
+    \item \textbf{報酬モデル $\mathcal{R}_a(s, s')$ (Reward Function)}:
     状態遷移に伴って得られる即時報酬（またはコスト）．
 	経路計画問題においては，通常「コストの最小化」または「負の報酬の最大化」として定式化される．
     例えば，ゴール状態に到達したときに大きな正の報酬を与え，
