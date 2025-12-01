@@ -61,7 +61,9 @@ AGVは環境が固定されており，かつタスクが定型的である場�
 \subsubsection{AGVから自律移動ロボット（Autonomous Mobile Robot: AMR）へ}
 AGVの課題を克服するため研究，開発が進められてきたのが，
 自律移動ロボット（AMR）である．
-AMRは，LiDAR（Light Detection and Ranging）やカメラといった外界センサ
+AMRは，図（\ref{fig:comparison}）に示すように，
+物理的なガイドを必要とせず，
+LiDAR（Light Detection and Ranging）やカメラといった外界センサ
 を通じて周囲の環境の情報を得る．
 このセンサ情報と事前に作成した環境地図を照らし合わせることで
 地図内の自身の位置を推定し，ガイドを必要とせず走行する．
@@ -80,7 +82,8 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 \begin{figure}
   \centering
   \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
-  \caption{AGVとAMRの比較図}
+  \caption{Comparison of AGV and AMR}
+  \label{fig:comparison}
 \end{figure}
 
 
@@ -94,19 +97,20 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 配送時間の短縮と環境負荷の低減を実現する有効な手段として位置付けられている\cite{alverhed2024}．
 日本国内においても，2023年4月に施行された改正道路交通法により，
 自律移動ロボットが遠隔操作型小型車として定義され，届出制による歩道走行が可能となった\cite{prrt2022}．
-これにより，パナソニックや楽天といった企業が住宅街での配送実証を行っており，
-社会実装が進みつつある．
+これにより，パナソニックや楽天といった企業が図（\ref{fig:mobile_robot}）
+に示すようなロボットを用いて，住宅街での配送実証を行っており，社会実装が進みつつある．
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{Rakuten's Autonomous Delivary Robot}
+  \label{fig:mobile_robot}
+\end{figure}
 
 また，農業分野では，農林水産省がスマート農業を推進しており\cite{satp2024}，
 クボタやヤンマーなどの農機メーカーが有人監視下での自動走行（レベル2）および無人自動走行（レベル3）に対応した
 ロボットトラクターを市場投入している\cite{kubota2017, yanmmar2019}．
 同様に，建設現場や鉱山といった過酷な環境においても，資材搬送や巡回監視を行うAMRの導入が進められている．
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
-  \caption{楽天とかの自動配送ロボットの写真を入れたい}
-\end{figure}
 
 しかしながら，屋内環境と比較して，
 屋外環境はロボットにとってタスクの遂行が困難となる要素が多い．
@@ -139,14 +143,15 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 
 \subsubsection{センシング}
 センシングは，ロボットが周囲の環境から情報を得るための技術である．
+以下に，移動ロボットで用いられる代表的なセンサ技術を示す．
 
 %引用はこれでええんか
 \begin{itemize}
     \item \textbf{LiDAR}: レーザー光を照射し，反射光が戻ってくるまでの時間（Time of Flight）
 	や位相差から距離を計測するセンサ．
 	北陽に代表される2次元平面をスキャンする2D LiDARが主流であったが，
-	近年では，HesaiやLivoxといった中国メーカーによる，
-	3次元点群を取得可能な3D LiDARの低価格化が進んでいる．
+	近年では，図（\ref{fig:3d-ldiar}）HesaiやLivoxといった中国メーカーの
+	3次元点群を取得可能な3D LiDARが低価格化し，主流になりつつある．
     \item \textbf{カメラ}: 可視光線を計測し，
 	人の知覚する色の分布を捉えることができるセンサ．
 	RGB画像に加え，深度情報を取得できるRGB-Dカメラや
@@ -166,6 +171,13 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 	電波の到達時間を用いて測位を行う．
 	%つくチャレでいっぱいアンテナ生やしているチームがあったので書いたけど，よくわからない
 \end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{3D LiDAR from Chinese manufacturer（Right: Hesai, Left: Livox）}
+  \label{fig:3d-lidar}
+\end{figure}
 
 \subsubsection{自己位置推定（Localization）}
 自己位置推定は，
