@@ -87,7 +87,7 @@ MDPの目的は，各状態でどのような行動をとるべきかという�
 得られる将来の報酬の総和（期待値）である．
 
 \begin{equation}
-    V^\pi(s) = \mathbb{E} \left[ \sum_{t=0}^{\infty} \gamma^t R_{t+1} \mid S_0 = s, \pi \right]
+    V(s) = \bigg\langle R(s, a, s') + V(s') \bigg\rangle_{P(s'| a, s)}
   \label{eq:value_func_def}
 \end{equation}
 
