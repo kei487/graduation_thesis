@@ -58,20 +58,21 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
 	例えば直進であれば，$(v, \omega) = (0.3[m/s], 0[rad/s]), (0.2, 0.1)$
 	行動 $a \in \mathcal{A}$ となる．
 
-    \item \textbf{状態遷移モデル $\mathcal{P}_a(s, s')$ (Transition Probability)}:
+    \item \textbf{状態遷移モデル $\mathcal{P}(s' | a, s)$ (Transition Probability)}:
     状態 $s$ で行動 $a$ を選択したときに，次の時刻に状態 $s'$ へ遷移する確率．
     \begin{equation}
         \mathcal{P}_a(s, s') = \Pr(S_{t+1}=s' \mid S_t=s, A_t=a)
     \end{equation}
     決定論的な環境（A*などが想定する世界）では，ある行動を行えば100\%意図した隣接セルへ移動する．
-	しかし実環境では，タイヤのスリップや制御誤差により，意図したセルへ移動できない場合がある．
-	MDPではこの不確実性を確率分布として明示的にモデル化できる．
-	例えば，「前進」を選択しても，10\%の確率で「横滑り」する，といった表現が可能である．
+	しかし実環境では，移動はタイヤのスリップや慣性などといった要因による誤差が含む．
+	MDPではこの不確実性を確率分布としてモデル化する．
+	例えば，「前進」を選択しても，10\%の確率で左右のセルに移動し，
+	5\%で行き過ぎて奥のセルに移動する，といった表現が可能である．
 
-    \item \textbf{報酬モデル $\mathcal{R}_a(s, s')$ (Reward Function)}:
-    状態遷移に伴って得られる即時報酬（またはコスト）．
-	経路計画問題においては，通常「コストの最小化」または「負の報酬の最大化」として定式化される．
-    例えば，ゴール状態に到達したときに大きな正の報酬を与え，
+    \item \textbf{報酬モデル $\mathcal{R}(s, a, s')$ (Reward Function)}:
+    状態遷移に伴って得られる評価でスカラで表される．
+	経路計画問題においては，コストの最小化または負の報酬の最大化として定式化される．
+    	例えば，ゴール状態に到達したときに大きな正の報酬を与え，
 	障害物に衝突したときに大きな負の報酬（ペナルティ）を与える．
 	また，移動にかかる時間やエネルギーを表現するため，
 	各ステップごとにわずかな負の報酬（ステップコスト）を与える．
@@ -79,30 +80,29 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
 
 \subsubsection{ベルマン方程式と価値関数}
 MDPの目的は，各状態でどのような行動をとるべきかというルール，
-すなわち「方策（Policy） $\pi: \mathcal{S} \to \mathcal{A}$」を見つけることである．
-最適な方策 $\pi^*$ を見つけるために，「状態価値関数 $V^\pi(s)$」を導入する．
+すなわち方策（Policy） $\pi: \mathcal{S} \to \mathcal{A}$を見つけることである．
+最適な方策 $\pi^*$ を見つけるために，状態価値関数 $V^\pi(s)$を導入する．
+状態価値関数は式（\ref{eq:value_func_def}）のように定義される．
 これは，ある状態 $s$ からスタートし，方策 $\pi$ に従って行動し続けたときに
 得られる将来の報酬の総和（期待値）である．
 
-
-割引率を $\gamma$ ($0 \le \gamma < 1$) とすると，価値関数は以下のように定義される．
 \begin{equation}
     V^\pi(s) = \mathbb{E} \left[ \sum_{t=0}^{\infty} \gamma^t R_{t+1} \mid S_0 = s, \pi \right]
+  \label{eq:value_func_def}
 \end{equation}
-
 
 最適な方策 $\pi^*$ に従ったときの価値関数を最適状態価値関数 $V^*(s)$ と呼ぶ．
-$V^*(s)$ は，以下のベルマン最適方程式（Bellman Optimality Equation）を満たす．
+$V^*(s)$ は，式（\ref{eq:bellman_eq}）に示すベルマン方程式（Bellman Equation）
+を満たす．
+ベルマン方程式は再帰的な構造をしており，
+ある状態の価値は，そこで最適な行動をとった際に期待される即時報酬と，
+遷移先の状態の価値の和によって決まることを意味している．
 \begin{equation}
     V^*(s) = \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
-	\mathcal{P}_a(s, s') \left[ \mathcal{R}_a(s, s') + \gamma V^*(s') \right]
-    \label{eq:bellman_opt}
+	\mathcal{P}(s'| a, s) \left[ \mathcal{R}(s, a, s') + V^*(s') \right]
+    \label{eq:bellman_eq}
 \end{equation}
 
-
-この方程式は再帰的な構造をしており，
-「ある状態の価値は，そこで最適な行動をとった際に期待される即時報酬と，
-遷移先の状態の価値の割引和によって決まる」ことを意味している．
 
 
 
@@ -137,6 +137,13 @@ $V$が収束すると，ロボットは$V$の値が小さくなるような行�
 ロボットのいる$s$から目的地に向かって値が
 単調減少していると，ロボットは目的地に向かうことができる．
 このような状態を，本稿では「経路が見つかる」と表現する．
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{Convergence of the value function}
+  \label{fig:vi_convergence}
+\end{figure}
 
 
 1章で述べたとおり，
