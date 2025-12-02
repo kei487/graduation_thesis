@@ -48,7 +48,7 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
 \begin{enumerate}
     \item \textbf{状態空間 $\mathcal{S}$ (State Space)}:
     ロボットが取り得るすべての状態の集合．
-	\ref{sec:prob_def}章で述べたように，価値反復ROSパッケージでは，
+	\ref{sec:}章で述べたように，価値反復ROSパッケージでは，
 	各グリッドセル $(x, y)$ とロボットの方位$\theta$を合わせた
 	$(x, y, \theta)$を一つの状態 $s \in \mathcal{S}$ に対応する．
 
@@ -92,7 +92,7 @@ MDPの目的は，各状態でどのような行動をとるべきかという�
 \end{equation}
 
 最適な方策 $\pi^*$ に従ったときの価値関数を最適状態価値関数 $V^*(s)$ と呼ぶ．
-$V^*(s)$ は，式（\ref{eq:bellman_eq}）に示すベルマン方程式（Bellman Equation）
+$V^*(s)$ は，式（\ref{eq:bellman_formula2}）に示すベルマン方程式（Bellman Equation）
 を満たす．
 ベルマン方程式は再帰的な構造をしており，
 ある状態の価値は，そこで最適な行動をとった際に期待される即時報酬と，
@@ -100,7 +100,7 @@ $V^*(s)$ は，式（\ref{eq:bellman_eq}）に示すベルマン方程式（Bell
 \begin{equation}
     V^*(s) = \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
 	\mathcal{P}(s'| a, s) \left[ \mathcal{R}(s, a, s') + V^*(s') \right]
-    \label{eq:bellman_eq}
+    \label{eq:bellman_formula2}
 \end{equation}
 
 
@@ -191,33 +191,38 @@ $V$の勾配は目的地の周辺からできはじめ，
 
 
 
-\subsection{価値反復アルゴリズム}
+\subsection{価値反復アルゴリズムの大域経路計画}
 ベルマン最適方程式 (\ref{eq:bellman_opt}) を用いて，
 反復計算により $V^*(s)$ を求める手法が価値反復法（Value Iteration）である．
 アルゴリズムの手順は以下の通りである．
 
 \begin{enumerate}
     \item \textbf{初期化}: すべての状態 $s$ について，$V(s)$ を任意の値（通常は0）に初期化する．
-    \item \textbf{反復更新}: 以下の更新式を，すべての状態 $s$ に対して適用する．
+    \item \textbf{価値更新}: 以下の更新式を，すべての状態 $s$ に対して適用する．
+    \begin{equation}
+        \pi(s) \leftarrow \operatorname*{argmin}_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
+	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + \gamma V(s') \right]
+      \label{eq:interation_pi}
+    \end{equation}
     \begin{equation}
         V_{k+1}(s) \leftarrow \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
-	\mathcal{P}_a(s, s') \left[ \mathcal{R}_a(s, s') + \gamma V_k(s') \right]
+	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + \gamma V_k(s') \right]
+      \label{eq:interation_v}
     \end{equation}
     ここで $k$ は反復回数を表す．
     \item \textbf{収束判定}: 全状態における価値関数の更新量 $|V_{k+1}(s) - V_k(s)|$ の最大値が，
 	事前に定めた閾値 $\epsilon$ 未満になれば停止する．
-    \item \textbf{方策抽出}: 収束した価値関数 $V^*(s)$ を用い，
-	各状態で価値を最大化する行動を選択する貪欲方策（Greedy Policy）を得る．
-    \begin{equation}
-        \pi^*(s) = \operatorname*{argmax}_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
-	\mathcal{P}_a(s, s') \left[ \mathcal{R}_a(s, s') + \gamma V^*(s') \right]
-    \end{equation}
 \end{enumerate}
 
 この計算により，環境内のあらゆる場所からゴールへ向かうための最適な「勾配」が得られる．
 これはポテンシャル場に似ているが，ポテンシャル法が抱える「局所解（Local Minima）」の問題
 （ゴール以外の窪みにハマって出られなくなる現象）が発生しないという強力な数学的保証がある．
 なぜなら，ベルマン方程式による更新は，大域的な最適性を伝播させる処理だからである．
+
+\subsection{価値反復アルゴリズムの局所経路計画}
+価値反復
+
+
 
 % \section{経路探索アルゴリズム}
 % 
