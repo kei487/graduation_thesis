@@ -56,6 +56,7 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
     各状態でロボットが選択可能な行動の集合．
 	価値反復ROSパッケージでは，速度$v$と角速度$\omega$の組で表される．
 	例えば直進であれば，$(v, \omega) = (0.3[m/s], 0[rad/s]), (0.2, 0.1)$
+		@@@単位は前が数字の場合はカッコでかこまないそうです. あと, ブロック体です. $0.3$[m/s]が正解@@@
 	行動 $a \in \mathcal{A}$ となる．
 
     \item \textbf{状態遷移モデル $\mathcal{P}(s' | a, s)$ (Transition Probability)}:
@@ -63,6 +64,7 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
     \begin{equation}
         \mathcal{P}_a(s, s') = \Pr(S_{t+1}=s' \mid S_t=s, A_t=a)
     \end{equation}
+		@@@これならサットン先生の記法$\mathcal{P}_{ss'}^a$か, $P(s'|a,s)$にしたほうがいいです@@@
     決定論的な環境（A*などが想定する世界）では，ある行動を行えば100\%意図した隣接セルへ移動する．
 	しかし実環境では，移動はタイヤのスリップや慣性などといった要因による誤差が含む．
 	MDPではこの不確実性を確率分布としてモデル化する．
@@ -70,6 +72,7 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$ で定義�
 	5\%で行き過ぎて奥のセルに移動する，といった表現が可能である．
 
     \item \textbf{報酬モデル $\mathcal{R}(s, a, s')$ (Reward Function)}:
+	    @@@これも$\mathcal{R}_{ss'}^a$か$R(s, a, s')$@@@
     状態遷移に伴って得られる評価でスカラで表される．
 	経路計画問題においては，コストの最小化または負の報酬の最大化として定式化される．
     	例えば，ゴール状態に到達したときに大きな正の報酬を与え，
