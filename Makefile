@@ -1,5 +1,5 @@
 main.pdf: main.dvi
-	dvipdfmx main.dvi
+	dvipdfmx -f font.map main.dvi
 
 main.dvi: *.tex
 	sed -e 's/。/. /g' -e 's/、/, /g' -i *.tex
