@@ -81,9 +81,9 @@ AMRは，AGVと違い，経路上に障害物を検知すると，回避経路�
 この特性により，AMRは従来AGVが導入困難であった動的な環境への適用が進んでおり，
 Society 5.0の中核を担う技術として期待されている\cite{stbc2016}．
 
-\begin{figure}[h]
+\begin{figure}[htb]
   \centering
-  \includegraphics[width=0.8\linewidth]{figs/b-thesis_fig1.eps}
+  \includegraphics[width=0.8\linewidth]{figs/AGV_AMR_diff.eps}
   \caption{Comparison of AGV and AMR}
   \label{fig:comparison}
 \end{figure}
@@ -102,9 +102,9 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 これにより，パナソニックや楽天といった企業が図（\ref{fig:mobile_robot}）
 に示すようなロボットを用いて，住宅街での配送実証を行っており，社会実装が進みつつある．
 
-\begin{figure}
+\begin{figure}[htb]
   \centering
-  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \includegraphics[width=0.8\linewidth]{figs/rakuten_robot.eps}
   \caption{Rakuten's Autonomous Delivary Robot(Source: \cite{Rakuten2025})}
   \label{fig:mobile_robot}
 \end{figure}
@@ -152,9 +152,11 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
     \item \textbf{LiDAR}: レーザー光を照射し，反射光が戻ってくるまでの時間（Time of Flight）
 	や位相差から距離を計測するセンサ．
 	北陽に代表される2次元平面をスキャンする2D LiDARが主流であったが，
-	近年では，図\ref{fig:3d-lidar}% @@@リンク切れ@@@
-	に示すHesaiやLivoxといった中国メーカーの
-	3次元点群を取得可能な3D LiDARが低価格化し，主流になりつつある．
+	図\ref{fig:3d-lidar}% @@@リンク切れ@@@
+	右に示すVelodyne Lidarに代表される
+	3次元点群を取得可能な3D LiDARが主流になりつつある．
+	近年では，図\ref{fig:3d-lidar}左に示す
+	Livoxなど中国メーカーの特に廉価なLiDARが多く流通している．
     \item \textbf{カメラ}: 可視光線を計測し，
 	人の知覚する色の分布を捉えることができるセンサ．
 	RGB画像に加え，深度情報を取得できるRGB-Dカメラや
@@ -176,10 +178,10 @@ Society 5.0の中核を担う技術として期待されている\cite{stbc2016}
 	%つくチャレでいっぱいアンテナ生やしているチームがあったので書いたけど，よくわからない
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[htb]
   \centering
-  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
-  \caption{3D LiDAR from Chinese manufacturer（Right: Hesai, Left: Livox）}
+  \includegraphics[width=0.8\linewidth]{figs/LiDAR.eps}
+  \caption{3D LiDAR（Right: Velodyne, Left: Livox）}
   \label{fig:3d-lidar}
 \end{figure}
 
