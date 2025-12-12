@@ -10,7 +10,7 @@
 ロボットが移動を行う空間を環境と言い，
 図\ref{fig:robot_env}にその環境の例を示す．
 
-\begin{figure}
+\begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\linewidth]{figs/environment.eps}
   \caption{An enviroment for mobile robot navigation}
@@ -141,7 +141,7 @@ $V$が収束すると，ロボットは$V$の値が小さくなるような行�
 単調減少していると，ロボットは目的地に向かうことができる．
 このような状態を，本稿では「経路が見つかる」と表現する．
 
-\begin{figure}
+\begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\linewidth]{figs/value_iteration_convegence.eps}
   \caption{Convergence of the value function}
@@ -196,26 +196,41 @@ $V$の勾配は目的地の周辺からできはじめ，
 
 \subsection{価値反復アルゴリズムによる経路計画}
 ベルマン最適方程式 (\ref{eq:bellman_opt}) を用いて，
-反復計算により $V^*(s)$ を求める手法が価値反復法（Value Iteration）である．
-アルゴリズムの手順は以下の通りである．
+反復計算により $V^*(s)$ を求める手法が価値反復（Value Iteration）である．
+詳細な計算とアルゴリズムの手順は以下の通りである．
 
 \begin{enumerate}
-    \item \textbf{初期化}: すべての状態 $s$ について，$V(s)$ を任意の値（通常は0）に初期化する．
+    \item \textbf{初期化}: 目的地に含まれる状態 $s_{goal}$ の$V(s_{goal})$は，$0$，その他の$s$の$V(s)$ は任意の値（通常は無限大）に初期化する．
     \item \textbf{価値更新}: 以下の更新式を，すべての状態 $s$ に対して適用する．
     \begin{equation}
         \pi(s) \leftarrow \operatorname*{argmin}_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
-	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + \gamma V(s') \right]
+	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + V(s') \right]
       \label{eq:interation_pi}
     \end{equation}
     \begin{equation}
-        V_{k+1}(s) \leftarrow \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
-	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + \gamma V_k(s') \right]
+        V_{k+1}(s) \leftarrow \min_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
+	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + V_k(s') \right]
       \label{eq:interation_v}
     \end{equation}
     ここで $k$ は反復回数を表す．
     \item \textbf{収束判定}: 全状態における価値関数の更新量 $|V_{k+1}(s) - V_k(s)|$ の最大値が，
 	事前に定めた閾値 $\epsilon$ 未満になれば停止する．
 \end{enumerate}
+
+また，一回の反復計算は，式（\ref{eq:iteration_pi}）と
+式（\ref{eq:iteration_v}）
+によって行われる．
+この2つの式のシグマ以降は同様の式で，
+すべての行動$a$の中から$V$を最小にする$a$を選ぶというものである．
+それぞれの行動による$V$は，移動先の状態＄$s'$の$V$と
+移動にかかる報酬$\mathcal{R}$の和に$s'$に移動する確率をかけたものである．
+
+ \begin{figure}[htb]
+   \centering
+   \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+   \caption{Calculation of the state value function}
+ \end{figure}
+
 
 この計算により，環境内のあらゆる場所からゴールへ向かうための最適な「勾配」が得られる．
 これはポテンシャル場に似ているが，ポテンシャル法が抱える「局所解（Local Minima）」の問題
