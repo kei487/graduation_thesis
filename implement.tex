@@ -21,6 +21,26 @@ ike\_nav\cite{ikenav}パッケージ内の
 A*探索ノード（ike\_nav\_planner）を3次元での探索に拡張し，
 価値反復ROSパッケージに移植して利用した．
 %もっと書く2　図もほしい
+3D A*は，
+価値反復と同様に，グリッドに加えて
+$\theta$方向にも離散化し，グラフを構築する．
+$XY$方向の遷移コストと$\theta$方向の遷移コストは単位が一致するよう
+距離から時間に変更した．
+
+ヒューリスティック関数$H$については，
+\cite{nakamura2024}での平面上のユークリッド距離を計算するものから，
+\begin{align}
+	H(s) \triangleq W_1 \sqrt{  (x_\text{c} - x_\text{g})^2 + (y_\text{c} - y_\text{g})^2 }
+	+ W_2 | \theta_\text{c} - \theta_\text{g} | \label{eq:3d-astar-heurisic}
+\end{align}
+に変更する．
+ここで，
+$(x_\text{c}, y_\text{c}, \theta_\text{c})$は各離散状態の中心の座標，
+$(x_\text{g}, y_\text{g})$は目的地の中心地点の$xy$座標，
+$\theta_\text{c} - \theta_\text{g}$は，$(x_\text{c}, y_\text{c}, \theta_\text{c})$
+から見た$(x_\text{g}, y_\text{g})$の方角である．
+$W_1, W_2$は定数である．
+$W_1$と$W_2$の比は，ロボットが一定時間あたりに移動できる距離と方向転換できる角度の比で決まる．
 
 
 \subsection{価値反復とA*の併用}
