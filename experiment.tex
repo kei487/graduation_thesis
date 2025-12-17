@@ -19,7 +19,12 @@
 占有格子地図である．
 白色が障害物のない画素，
 黒色が障害物のある画素,灰色が不明な画素を表す.
-この地図のパラメータは表\ref{tab:map}の通りである．
+この地図のパラメータは表\ref{tab:map_info}の通りである．
+
+価値反復ROSパッケージでは，地図のグリッドに加え，
+$\theta$方向にも離散化を行い$\mathbb{S}$を構成する．
+$S$の諸元を表\ref{tab:vi_info}に示す．
+要素数は1億に達し，移動可能なエリアだけでも1千万に達する．
 
 \begin{figure}[htb]
   \centering
@@ -45,10 +50,18 @@
 	\end{small}
 \end{table}
 
-価値反復ROSパッケージでは，地図のグリッドに加え，
-$\theta$方向にも離散化を行い$mathbb{S}$を構成する．
-$S$の諸元を表\ref{tab:vi_s}に示す．
-要素数は1億に達し，移動可能なエリアだけでも1千万に達する．
+\begin{table}[bt]
+    \centering
+    \caption{Configurations of Value Iteration Status}
+    \label{tab:vi_info}
+	\begin{small}
+    \begin{tabular}{l|l}
+        \hline
+        the area of the free cells & 3714.98[m$^2$] \\
+        \hline
+    \end{tabular}
+	\end{small}
+\end{table}
 
 実験で使用するシミュレータは，
 図\ref{fig:map_loc}から作成したシミュレータを使用する．
@@ -72,14 +85,18 @@ Gazeboを使用し，
 進行方向に対して前後に進むことができるが，
 横に進むことができない．
 そのため，当然ながらゴールの方向へ進むには
-その方向を向く必要があり，
-位置と方向の3次元で経路を探索することで効率化が計れる．
+その方向かその反対を向く必要がある．
+このロボットは，前が設定されており，
+構造上，進行方向を向いて進むことが推奨される．
+つまり，行動には向きの制限がつくため，
+位置と方向の3次元で経路を探索することで
+移動の効率化が計れる．
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
   \caption{a robot for simlation}
-  \label{fig:map_loc}
+  \label{fig:raspicat}
 \end{figure}
 
 
