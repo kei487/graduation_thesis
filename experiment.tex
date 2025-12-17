@@ -13,7 +13,7 @@
 \subsection{実験条件}
 シミュレータ実験では，
 千葉工業大学津田沼キャンパスで得られた
-図\ref{fig:map}の地図を使用する．
+図\ref{fig:map_nav}の地図を使用する．
 紙面横方向が300m，縦方向が200mの6haの環境の地図で，
 形式は，ROSのナビゲーションスタックで用いられる
 占有格子地図である．
@@ -21,18 +21,49 @@
 黒色が障害物のある画素,灰色が不明な画素を表す.
 この地図のパラメータは表\ref{tab:map}の通りである．
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{a map for localization}
+  \label{fig:map_nav}
+\end{figure}
+
+\begin{table}[bt]
+    \centering
+    \caption{Configurations of the Map}
+    \label{tab:map_info}
+	\begin{small}
+    \begin{tabular}{l|l}
+        \hline
+        map size & 294.6[m]$\times$199.95[m] \\
+        cell resolution & 0.15[m]$\times$0.15[m] \\
+        number of cells & 2,615,346 \\
+        number of free cells & 165,076 \\
+        the area of the free cells & 3714.98[m$^2$] \\
+        \hline
+    \end{tabular}
+	\end{small}
+\end{table}
+
 価値反復ROSパッケージでは，地図のグリッドに加え，
 $\theta$方向にも離散化を行い$mathbb{S}$を構成する．
 $S$の諸元を表\ref{tab:vi_s}に示す．
 要素数は1億に達し，移動可能なエリアだけでも1千万に達する．
 
 実験で使用するシミュレータは，
-図\ref{fig:map}から作成したシミュレータを使用する．
+図\ref{fig:map_loc}から作成したシミュレータを使用する．
 シミュレータには，ROSの標準的なシミュレータである
 Gazeboを使用し，
 シミュレータ内で用いる静的な障害物の作成には，
 占有格子地図から作成するプログラム\cite{ikebe2020sim}
 を使用した．
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{a map for localization}
+  \label{fig:map_loc}
+\end{figure}
 
 シミュレータ内で走行させるロボットは，
 図\ref{fig:raspicat}
@@ -43,6 +74,14 @@ Gazeboを使用し，
 そのため，当然ながらゴールの方向へ進むには
 その方向を向く必要があり，
 位置と方向の3次元で経路を探索することで効率化が計れる．
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+  \caption{a robot for simlation}
+  \label{fig:map_loc}
+\end{figure}
+
 
 実験に用いた計算機は，CPUとしてRyzen 9 7945HX3D（16コア32スレッド），
 DRAMとしてDDR5-4800 32GBが2枚（64GB）搭載されたものである．
@@ -65,25 +104,9 @@ CPUから見ると，A*には1つのスレッドを割くこととなる．
 また，シミュレーションにはGazeboを使用するため，
 これにも計算機のリソースを使用している．
 
-実験では，図\ref{fig:map}3つの目的地で比較を行った．
+実験では，図\ref{fig:map_nav}3つの目的地で比較を行った．
 Goal1は．．．
 
-\begin{table}[bt]
-    \centering
-    \caption{Configurations of the Map}
-    \label{tab:map_info}
-	\begin{small}
-    \begin{tabular}{l|l}
-        \hline
-        map size & 294.6[m]$\times$199.95[m] \\
-        cell resolution & 0.15[m]$\times$0.15[m] \\
-        number of cells & 2,615,346 \\
-        number of free cells & 165,076 \\
-        the area of the free cells & 3714.98[m$^2$] \\
-        \hline
-    \end{tabular}
-	\end{small}
-\end{table}
 
 
 % \begin{figure}[tbh]
