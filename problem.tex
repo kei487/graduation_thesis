@@ -70,8 +70,9 @@ $\langle \mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R} \rangle$
     \item \textbf{行動の集合 $\mathcal{A}$ (Action Space)}:
     各状態でロボットが選択可能な行動の集合．
 	価値反復ROSパッケージでは，速度$v$と角速度$\omega$の組で表される．
-	例えば直進であれば，$(v, \omega) = (0.3[m/s], 0[rad/s]), (0.2, 0.1)$
-		@@@単位は前が数字の場合はカッコでかこまないそうです. あと, ブロック体です. $0.3$[m/s]が正解@@@
+	例えば直進であれば，$(v, \omega) = (0.3$m/s$, 0$rad/s$), (0.2, 0.1)$
+		%↓　含めいい書き方考える，今のはあまりしっくり来ていない
+		%@@@単位は前が数字の場合はカッコでかこまないそうです. あと, ブロック体です. $0.3$[m/s]が正解@@@
 	行動 $a \in \mathcal{A}$ となる．
 
     \item \textbf{状態遷移モデル $\mathcal{P}(s' | a, s)$ (Transition Probability)}:
