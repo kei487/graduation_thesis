@@ -122,8 +122,21 @@ CPUから見ると，A*には1つのスレッドを割くこととなる．
 これにも計算機のリソースを使用している．
 
 実験では，図\ref{fig:map_nav}3つの目的地で比較を行った．
-Goal1は．．．
+Goal1は，\cite{nakamura2024}のヒューリスティック関数，
+あるいは式(\ref{eq:3d_astar_h})のヒューリスティック関数
+を使ったときにすぐ経路が見つかるように設定した．
+同様に，Goal2は，障害物に阻まれ，大きな迂回が必要なように，
+Goal3は，旋回の所要時間を考慮しない\cite{nakamura2024}のA*が不利になるように，
+スタートでのロボットの向きと反対方向に設定した．
+Goal2に迂回が必要となるのは，
+図\ref{fig:map_nav}右の丸で囲ったところやその他数カ所に，
+移動ロボットが跨げない段差が存在するからである．
 
+比較するプログラムは，価値反復ROSパッケージ単体，
+2D A*と価値反復ROSパッケージを併用したもの，
+3D A*と価値反復ROSパッケージを併用したものの3つである．
+これとは別に，2D A* の経路をpure pursuitで追従したものの
+A*の計算時間と移動時間を計測し，ロボットが移動するのにかかる時間を計測する．
 
 
 % \begin{figure}[tbh]
@@ -156,9 +169,43 @@ Goal1は．．．
 %\end{figure}
 
 \subsection{実験結果}
-要追加
+実験結果を表\ref{tab:result}に示す．
+
+
+\begin{table}[htb]
+    \centering
+    \caption{Result with the Map of Outdoor Environment}
+    \label{tab:result}
+	\begin{small}
+    \begin{tabular}{l|ccc}
+        \hline
+	    & \multicolumn{3}{c}{traveling time (standard deviation)[s]} \\
+            methods & Goal1 & Goal2 & Goal3 \\
+        \hline
+            VI & 226 (7) & \, 597 (1)\phantom{00}  & 62 (7) \\
+	    VI$+$2D A* & 214 (1) & 1135 (129) & 69 (2) \\
+            VI$+$3D A* & 219 (1) & 1414 (169) & 54 (4) \\
+            2D A* & 0 (0) & 0 (0)  & 0 (0) \\
+        \hline
+    \end{tabular}
+	\end{small}
+    \centering
+    \caption{Calculation Time for Temporal Path}
+    \label{tab:result_path}
+	\begin{small}
+    \begin{tabular}{c|ccc}
+        \hline
+	    & \multicolumn{3}{c}{calculation time (standard deviation)[s]} \\
+            methods & Goal1 & Goal2 & Goal3 \\
+        \hline
+	    2D A* & 2.3 (0.3) & \ 27 (0.1) & 2.4 (0.1) \\
+            3D A* & 2.5 (0.2) & 189 (8.5) & 2.8 (0.1) \\
+        \hline
+    \end{tabular}
+	\end{small}
+\end{table}
 
 % 実機で実験したい．
-\section{実機実験}
+% \section{実機実験}
 
 
