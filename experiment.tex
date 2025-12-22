@@ -170,12 +170,45 @@ Goal2に迂回が必要となるのは，
 \subsection{実験結果}
 実験結果を表\ref{tab:result}に示す．
 
+VIのみ，VI+2D A*，VI+3D A*での
+ロボットが移動に要する時間を比較した．
+5回ずつの試行の結果を表\ref{tab:result}に示す．
+また，2D，3DのA*が暫定経路の算出にかけた時間
+を表\ref{tab:result_path}に示す．
+
+Goal1では，2D，3D A*のどちらも，
+移動時間短縮の効果を確認できる．
+また，A*の計算も表\ref{tab:result_path}から，
+移動時間全体と比較して2\%以内には終わっていることが分かる．
+Goal3では設置の意図通り，A*を3Dにする効果が確認できている．
+
+Goal2については，2D，3D A*とも，
+VIだけを使う方法より大幅に時間がかかった．
+A*は最短の経路を見つけていたが，
+価値反復の計算の途中で$V$の勾配に分岐が生じ，
+ロボットが迷走するという現象が見られた．
+\cite{nakamura2024}ではこのような現象は
+発見されなかったが，本稿ではこの問題が顕在化した．
+
+また，Goal2では3D A*の計算時間が2D A*よりも大きくなった．
+Goal3の場合のように，2Dよりも3D A*のほうが
+効率的な経路が見つかる可能性が高い一方，
+探索空間が大きくなる問題が確認された．
+
+
+上記のロボットが迷走する問題の対策については，
+A*探索を定期的に何度も実行する方法が考えられる．
+そうすることで$V$に分岐が生じた際，
+その状態からゴールまでの別の経路をA*が発見できる可能性がある．
+ただし，価値反復が計算した正確な$V$を上書きして変更する
+可能性もあるため，式(1)での勾配のつけかたに工夫が必要とされる．
+
+
 
 \begin{table}[htb]
     \centering
     \caption{Result with the Map of Outdoor Environment}
     \label{tab:result}
-	\begin{small}
     \begin{tabular}{l|ccc}
         \hline
 	    & \multicolumn{3}{c}{traveling time (standard deviation)[s]} \\
@@ -184,14 +217,11 @@ Goal2に迂回が必要となるのは，
             VI & 226 (7) & \, 597 (1)\phantom{00}  & 62 (7) \\
 	    VI$+$2D A* & 214 (1) & 1135 (129) & 69 (2) \\
             VI$+$3D A* & 219 (1) & 1414 (169) & 54 (4) \\
-            2D A* & 204 (0) & 571 (1)\phantom{00}  &  \\
         \hline
     \end{tabular}
-	\end{small}
     \centering
     \caption{Calculation Time for Temporal Path}
-    \label{tab:result_path}
-	\begin{small}
+    \label{tab:result_calc}
     \begin{tabular}{c|ccc}
         \hline
 	    & \multicolumn{3}{c}{calculation time (standard deviation)[s]} \\
@@ -201,7 +231,32 @@ Goal2に迂回が必要となるのは，
             3D A* & 2.5 (0.2) & 189 (8.5) & 2.8 (0.1) \\
         \hline
     \end{tabular}
-	\end{small}
+    \centering
+    \caption{Travering Time for Temporal Path}
+    \label{tab:result_track}
+    \begin{tabular}{c|cc}
+        \hline
+	    & \multicolumn{2}{c}{travering time (standard deviation)[s]} \\
+            methods & Goal1 & Goal2  \\
+        \hline
+            2D A* & 204 (0) & 571 (1)  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[htb]
+    \centering
+    \caption{Time for Temporal Path}
+    \label{tab:result_track}
+    \begin{tabular}{c|cccc}
+        \hline
+	    & \multicolumn{4}{c}{time (standard deviation)[s]} \\
+            Methods & All & Calculate & Travering  & Other \\
+        \hline
+            2D A* & 1135(129) & 27(0.1)  & 571 (1) & 537(130) \\
+            3D A* & 1414(169) & 189(8.5) & 571 (1) & 654(179) \\
+        \hline
+    \end{tabular}
 \end{table}
 
 % 実機で実験したい．
