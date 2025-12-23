@@ -9,8 +9,24 @@ ROS 2のノードの形式で実装し，
 実装には，\texttt{ike\_nav}\cite{[5]}
 パッケージ内の\texttt{ike\_nav\_planner}をA*
 探索のプログラムとして流用した．
+\texttt{ike\_nav\_planner}のアルゴリズム
+の部分を流用し，通信部分と，ROS 2のノードとして使うための部分を
+書き換えた．
+
 \texttt{ike\_nav\_planner}は
 マップと現在地と目的地に対してA*で計算された経路を出力する．
+使われるA*のヒューリスティック関数$H_{2D}$は，ユークリッド距離であり，
+\begin{align}
+	H_{2D}(s) \triangleq W \sqrt{  (x_\text{c} - x_\text{g})^2 + (y_\text{c} - y_\text{g})^2 }
+        \label{eq:2d-astar-heurisic}
+\end{align}
+と定義する．
+ここで，
+$(x_\text{c}, y_\text{c})$は各離散状態の中心の座標，
+$(x_\text{g}, y_\text{g})$は目的地の中心地点の$xy$座標，
+$W$は，定数である．
+この$W$を調整し真のコストを$H_{2D}$が上回らないようにすることで，
+経路の最適性が保証される．
 %もっと書く
 
 
@@ -27,16 +43,16 @@ $\theta$方向にも離散化し，グラフを構築する．
 $XY$方向の遷移コストと$\theta$方向の遷移コストは単位が一致するよう
 距離から時間に変更した．
 
-ヒューリスティック関数$H$については，
-\cite{nakamura2024}での平面上のユークリッド距離を計算するものから，
+ヒューリスティック関数$H_{3D}$については，
+$H_2$から，角度の情報を付け加えた．
+%\cite{nakamura2024}での平面上のユークリッド距離を計算するものから，
 \begin{align}
-	H(s) \triangleq W_1 \sqrt{  (x_\text{c} - x_\text{g})^2 + (y_\text{c} - y_\text{g})^2 }
+	H_{3D}(s) \triangleq W_1 \sqrt{  (x_\text{c} - x_\text{g})^2 + (y_\text{c} - y_\text{g})^2 }
 	+ W_2 | \theta_\text{c} - \theta_\text{g} | \label{eq:3d-astar-heurisic}
 \end{align}
 に変更する．
 ここで，
-$(x_\text{c}, y_\text{c}, \theta_\text{c})$は各離散状態の中心の座標，
-$(x_\text{g}, y_\text{g})$は目的地の中心地点の$xy$座標，
+$\theta_\text{c}$は各離散状態の中心の角度，
 $\theta_\text{c} - \theta_\text{g}$は，$(x_\text{c}, y_\text{c}, \theta_\text{c})$
 から見た$(x_\text{g}, y_\text{g})$の方角である．
 $W_1, W_2$は定数である．
@@ -45,16 +61,41 @@ $W_1$と$W_2$の比は，ロボットが一定時間あたりに移動できる�
 
 \subsection{価値反復とA*の併用}
 価値反復ROSパッケージ内に
-A*で算出した経路上で，式（\ref{eq:purpose}）
+A*で算出した経路上で，式（\ref{eq:propose}）
 に従って，$V$の値を書き換えるコードを追加した．
-ただし，2D A*は，出力される経路は$XY$平面上のもので，$\theta$
-方向の情報がない．そのため，$XY$平面上で同じ位置にある
-離散状態にはすべて同じ値を式(\ref{eq:a-star_weight})
-で代入し，あとは価値反復で$\theta$方向の$V$の値を計算させることとした．
-この実装には改良の余地があり，
-$XY\theta$空間内でのA*探索を用いるほうが，
-より時間短縮の効果が得られるものと考えられる．
+これにより$V$の勾配がロボット付近に生成され，
+ロボットは走り出すことができると考えられる．
+
+\subsubsection{2D A*}
+2D A*が出力する経路$p_i$（$i \in \mathbb N $）は$XY$平面上のものであり，
+$\theta$方向の情報がない．
+つまり，$p_i = (x_i \; \:  y_i)^T$と表せ，
+式(\ref{eq:propose})上の$f$は，この経路の集合$p_i \in P$
+に対して実数を返す関数と解釈できる．
+よって，式（\ref{eq:propose}）を$\theta$全体の集合$\Theta \subset S$を用いて
+\begin{align}
+	V ( \begin{pmatrix} x_i \\ y_i \\ \theta\end{pmatrix} 
+		| \theta \in \Theta)
+	 	\longleftarrow K f ( \begin{pmatrix} x_i \\ y_i \end{pmatrix} )
+	\label{eq:propose}
+\end{align}
+と実装した．$XY$平面上で同じ位置にある
+離散状態にはすべて同じ値を代入する．
+$\theta$方向の$V$の値は，
+すべて同じであるが，
+価値反復の計算によって勾配が形成される．
+この実装では，価値反復の生成する勾配とは
+異なる値を代入してしまっている．
+これにより，通常起き得ない$V$の値の遷移によって
+移動に対して悪影響がでると考えられる．
 %式もっかい出したり図入れたり
+
+\subsubsection{3D A*}
+3D A*が出力する経路$p_i$は，$XY\theta$空間上のものであるため，
+$p_i = (x_i \; \:  y_i \;\: \theta )^T$と表せる．
+このとき$f$の引数と$V$の引数が一致する．
+そのため，式（\ref{propose}）を実直に実装した．
+
 
 %余裕があれば書きたい
 % \section{提案手法の実機への適用}
