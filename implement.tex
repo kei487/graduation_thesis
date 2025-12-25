@@ -6,7 +6,7 @@
 価値反復ROSパッケージに，A*探索を行うスレッドを
 1つ追加した．
 ROS 2のノードの形式で実装し，
-実装には，\texttt{ike\_nav}\cite{[5]}
+実装には，\texttt{ike\_nav}\cite{池邉2023ikenav}
 パッケージ内の\texttt{ike\_nav\_planner}をA*
 探索のプログラムとして流用した．
 \texttt{ike\_nav\_planner}のアルゴリズム
@@ -33,7 +33,7 @@ $W$は，定数である．
 \subsubsection{3D A*の実装}
 そこで，$XY\theta$空間で探索を行うA*を実装した．
 A*の具体的な実装については，
-ike\_nav\cite{ikenav}パッケージ内の
+ike\_nav\cite{池邉2023ikenav}パッケージ内の
 A*探索ノード（ike\_nav\_planner）を3次元での探索に拡張し，
 価値反復ROSパッケージに移植して利用した．
 %もっと書く2　図もほしい
@@ -48,7 +48,8 @@ $H_2$から，角度の情報を付け加えた．
 %\cite{nakamura2024}での平面上のユークリッド距離を計算するものから，
 \begin{align}
 	H_{3D}(s) \triangleq W_1 \sqrt{  (x_\text{c} - x_\text{g})^2 + (y_\text{c} - y_\text{g})^2 }
-	+ W_2 | \theta_\text{c} - \theta_\text{g} | \label{eq:3d-astar-heurisic}
+	+ W_2 | \theta_\text{c} - \theta_\text{g} | 
+	\label{eq:3d-astar-heurisic}
 \end{align}
 に変更する．
 ここで，
@@ -94,7 +95,7 @@ $\theta$方向の$V$の値は，
 3D A*が出力する経路$p_i$は，$XY\theta$空間上のものであるため，
 $p_i = (x_i \; \:  y_i \;\: \theta )^T$と表せる．
 このとき$f$の引数と$V$の引数が一致する．
-そのため，式（\ref{propose}）を実直に実装した．
+そのため，式（\ref{eq:propose}）を実直に実装した．
 
 
 %余裕があれば書きたい

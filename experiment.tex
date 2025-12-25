@@ -21,8 +21,9 @@
 この地図のパラメータは表\ref{tab:map_info}の通りである．
 
 価値反復ROSパッケージでは，地図のグリッドに加え，
-$\theta$方向にも離散化を行い$\mathbb{S}$を構成する．
-$S$の諸元を表\ref{tab:vi_info}に示す．
+$\theta$方向にも離散化を行い$S$を構成する．
+$S$及び価値反復ROSパッケージの諸元を表\ref{tab:vi_info}に，
+行動のリストを表\ref{tab:vi_action}に示す．
 状態の数は1億に達し，移動可能なエリアだけでも1千万に達する．
 
 \begin{figure}[htb]
@@ -51,25 +52,12 @@ $S$の諸元を表\ref{tab:vi_info}に示す．
 
 \begin{table}[bt]
     \centering
-    \caption{Configurations of Value Iteration Status}
-    \label{tab:vi_s_info}
-	\begin{small}
-    \begin{tabular}{l|l}
-        \hline
-        number of states & 156,920,760 \\
-	number of free states & 9,904,560 \\
-        \hline
-    \end{tabular}
-	\end{small}
-\end{table}
-
-\begin{table}[bt]
-    \centering
     \caption{List of Action in Value Iteration}
-    \label{tab:vi_action_info}
+    \label{tab:vi_action}
 	\begin{small}
     \begin{tabular}{l|cc}
-	Action name & linear velocity & angular velocity \\
+        \hline
+	Type & Linear Velocity [m/s] & Angular Velocity [deg/s] \\
         \hline
 	forward & 0.3 & 0.0 \\
 	back & -0.2 & 0.0 \\
@@ -82,13 +70,30 @@ $S$の諸元を表\ref{tab:vi_info}に示す．
 	\end{small}
 \end{table}
 
+\begin{table}[bt]
+    \centering
+    \caption{Parameters of Value Iteration}
+    \label{tab:vi_info}
+	\begin{small}
+    \begin{tabular}{l|l}
+        \hline
+	$\theta$-axis status resolution & 6 deg \\
+        number of states & 156,920,760 \\
+	number of free states & 9,904,560 \\
+	number of actions & 6 \\
+	$\Delta$t & 1 \\
+        \hline
+    \end{tabular}
+	\end{small}
+\end{table}
+
 
 実験で使用するシミュレータは，
 図\ref{fig:map_loc}から作成したシミュレータを使用する．
 シミュレータには，ROSの標準的なシミュレータである
-Gazeboを使用し，
+Gazebo\cite{Gazebo}を使用し，
 シミュレータ内で用いる静的な障害物の作成には，
-占有格子地図から作成するプログラム\cite{ikebe2020sim}
+占有格子地図から作成するプログラム\cite{池邉2024sim}
 を使用した．
 
 \begin{figure}[htb]
@@ -110,6 +115,7 @@ Gazeboを使用し，
 位置と方向の3次元で経路を探索することで
 移動の効率化が計れる．
 
+% この写真微妙なのであとで差し替える
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.8\linewidth]{figs/raspicat.eps}
@@ -129,7 +135,7 @@ DRAMについては，地図の大きさに応じて決定した．
 % スレッド数とゴール設定，比較対象は変更して実験をし直したい
 % 大域計画だけにスレッドを割り振り
 % 比較対象にA*経路にただ追従するものを追加して
-価値反復ROSパッケージは，効率化のため並行に$V$を計算できるよう
+価値反復ROSパッケージは，計算の効率化のため並行に$V$を計算できるよう
 実装されている．
 環境の全域で$V$を計算する大域計画器と，
 ロボットの周囲で$V$を計算する局所計画器に任意のスレッドの数
@@ -137,16 +143,16 @@ DRAMについては，地図の大きさに応じて決定した．
 本稿の実験では，大域計画器に8，
 局所計画器に6のスレッドを割り当てた．
 また，A*は別のプロセスで動作し，
-CPUから見ると，A*には1つのスレッドである．
-また，シミュレーションにはGazeboを使用するため，
-これにも計算機のリソースを使用している．
+CPUから見ると，A*は1つのスレッドである．
+また，シミュレータのGazeboにも計算機のリソースを使用している．
 
 実験では，図\ref{fig:map_nav}に示す3つの目的地で比較を行った．
-Goal1は，\cite{nakamura2024}のヒューリスティック関数，
-あるいは式(\ref{eq:3d_astar_h})のヒューリスティック関数
+Goal1は，式（\ref{eq:2d-astar-heurisic}）
+あるいは式(\ref{eq:3d-astar-heurisic})のヒューリスティック関数
 を使ったときにすぐ経路が見つかるように設定した．
 同様に，Goal2は，障害物に阻まれ，大きな迂回が必要なように，
-Goal3は，旋回の所要時間を考慮しない\cite{nakamura2024}のA*が不利になるように，
+Goal3は，旋回の所要時間を考慮しない式（\ref{eq:2d-astar-heurisic}）
+のA*が不利になるように，
 スタートでのロボットの向きと反対方向に設定した．
 Goal2に迂回が必要となるのは，
 図\ref{fig:map_nav}右の丸で囲ったところやその他数カ所に，
@@ -158,36 +164,6 @@ Goal2に迂回が必要となるのは，
 これとは別に，2D A* の経路をpure pursuitで追従したもので
 移動時間を計測し，ロボットが移動するのにかかる時間を計測する．
 
-
-% \begin{figure}[tbh]
-%     \centering
-%     \begin{minipage}{1 \linewidth}
-%         \centering
-%         \includegraphics[width=1 \linewidth]{figures/map.eps}
-%     \end{minipage}
-%     \caption{the Map for Navigation}
-%     \label{fig:map_exp1}
-% \end{figure}
-% 
-% 
-% \begin{figure}[tbh]
-%     \centering
-%     \begin{minipage}{1 \linewidth}
-%         \centering
-%         \includegraphics[width=0.8 \linewidth]{figures/raspicat.eps}
-%     \end{minipage}
-%     \caption{Simulated Rasberry Pi Cat}
-%     \label{fig:raspicat}
-% \end{figure}
-
-
-%\begin{figure}[hbt]
-%    \centering
-%  \includegraphics[width=0.8\linewidth]{figs/map.eps}
-%  \caption{Map for experiment},
-%  \label{fig:map}
-%\end{figure}
-
 \subsection{実験結果}
 実験結果を表\ref{tab:result}に示す．
 
@@ -195,11 +171,11 @@ VIのみ，VI+2D A*，VI+3D A*での
 ロボットが移動に要する時間を比較した．
 5回ずつの試行の結果を表\ref{tab:result}に示す．
 また，2D，3DのA*が暫定経路の算出にかけた時間
-を表\ref{tab:result_path}に示す．
+を表\ref{tab:result_calc}に示す．
 
 Goal1では，2D，3D A*のどちらも，
 移動時間短縮の効果を確認できる．
-また，A*の計算も表\ref{tab:result_path}から，
+また，A*の計算も表\ref{tab:result_calc}から，
 移動時間全体と比較して2\%以内には終わっていることが分かる．
 Goal3では設置の意図通り，A*を3Dにする効果が確認できている．
 
@@ -208,8 +184,6 @@ VIだけを使う方法より大幅に時間がかかった．
 A*は最短の経路を見つけていたが，
 価値反復の計算の途中で$V$の勾配に分岐が生じ，
 ロボットが迷走するという現象が見られた．
-\cite{nakamura2024}ではこのような現象は
-発見されなかったが，本稿ではこの問題が顕在化した．
 
 また，Goal2では3D A*の計算時間が2D A*よりも大きくなった．
 Goal3の場合のように，2Dよりも3D A*のほうが
@@ -222,7 +196,8 @@ A*探索を定期的に何度も実行する方法が考えられる．
 そうすることで$V$に分岐が生じた際，
 その状態からゴールまでの別の経路をA*が発見できる可能性がある．
 ただし，価値反復が計算した正確な$V$を上書きして変更する
-可能性もあるため，式(1)での勾配のつけかたに工夫が必要とされる．
+可能性もあるため，式（\ref{eq:propose}）
+での勾配のつけかたに工夫が必要とされる．
 
 
 
@@ -263,16 +238,13 @@ A*探索を定期的に何度も実行する方法が考えられる．
             2D A* & 204 (0) & 571 (1)  \\
         \hline
     \end{tabular}
-\end{table}
-
-\begin{table}[htb]
     \centering
-    \caption{Time for Temporal Path}
-    \label{tab:result_track}
+    \caption{Time for Goal 2}
+    \label{tab:result_g2}
     \begin{tabular}{c|cccc}
         \hline
-	    & \multicolumn{4}{c}{time (standard deviation)[s]} \\
-            Methods & All & Calculate & Travering  & Other \\
+	    & \multicolumn{4}{c}{times for Goal 2 (standard deviation)[s]} \\
+            Methods & All & Calculate & Moving & Other \\
         \hline
             2D A* & 1135(129) & 27(0.1)  & 571 (1) & 537(130) \\
             3D A* & 1414(169) & 189(8.5) & 571 (1) & 654(179) \\

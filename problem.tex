@@ -199,7 +199,7 @@ $V$の勾配は目的地の周辺からできはじめ，
 
 
 \subsection{価値反復アルゴリズムによる経路計画}
-ベルマン最適方程式 (\ref{eq:bellman_opt}) を用いて，
+ベルマン最適方程式 (\ref{eq:bellman_formula2}) を用いて，
 反復計算により $V^*(s)$ を求める手法が価値反復（Value Iteration）である．
 詳細な計算とアルゴリズムの手順は以下の通りである．
 
@@ -209,12 +209,12 @@ $V$の勾配は目的地の周辺からできはじめ，
     \begin{equation}
         \pi(s) \leftarrow \operatorname*{argmin}_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
 	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + V(s') \right]
-      \label{eq:interation_pi}
+      \label{eq:iteration_pi}
     \end{equation}
     \begin{equation}
         V_{k+1}(s) \leftarrow \min_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
 	\mathcal{P}(s'|a, s) \left[ \mathcal{R}(s, a, s') + V_k(s') \right]
-      \label{eq:interation_v}
+      \label{eq:iteration_v}
     \end{equation}
     ここで $k$ は反復回数を表す．
     \item \textbf{収束判定}: 全状態における価値関数の更新量 $|V_{k+1}(s) - V_k(s)|$ の最大値が，
