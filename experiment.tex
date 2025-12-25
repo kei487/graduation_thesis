@@ -23,7 +23,7 @@
 価値反復ROSパッケージでは，地図のグリッドに加え，
 $\theta$方向にも離散化を行い$\mathbb{S}$を構成する．
 $S$の諸元を表\ref{tab:vi_info}に示す．
-要素数は1億に達し，移動可能なエリアだけでも1千万に達する．
+状態の数は1億に達し，移動可能なエリアだけでも1千万に達する．
 
 \begin{figure}[htb]
   \centering
@@ -52,15 +52,36 @@ $S$の諸元を表\ref{tab:vi_info}に示す．
 \begin{table}[bt]
     \centering
     \caption{Configurations of Value Iteration Status}
-    \label{tab:vi_info}
+    \label{tab:vi_s_info}
 	\begin{small}
     \begin{tabular}{l|l}
         \hline
-        the area of the free cells & 3714.98[m$^2$] \\
+        number of states & 156,920,760 \\
+	number of free states & 9,904,560 \\
         \hline
     \end{tabular}
 	\end{small}
 \end{table}
+
+\begin{table}[bt]
+    \centering
+    \caption{List of Action in Value Iteration}
+    \label{tab:vi_action_info}
+	\begin{small}
+    \begin{tabular}{l|cc}
+	Action name & linear velocity & angular velocity \\
+        \hline
+	forward & 0.3 & 0.0 \\
+	back & -0.2 & 0.0 \\
+	right & 0.0 & -20.0 \\
+	right forward & 0.2 & -20.0 \\
+	left & 0.0 & 20.0 \\
+	left forward & 0.2 & 20.0 \\
+        \hline
+    \end{tabular}
+	\end{small}
+\end{table}
+
 
 実験で使用するシミュレータは，
 図\ref{fig:map_loc}から作成したシミュレータを使用する．
