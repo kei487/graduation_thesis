@@ -8,8 +8,9 @@
 \ref{sec:with3dastar}節は，文献\cite{中村2025}で発表したものである．
 
 
-\section{価値反復とA*を組み合わせた大域計画}\label{sec:with2dastar}
-A*と価値反復を並列に計算し，A*の計算結果を価値反復に適用する．
+\section{価値反復と2D A*を組み合わせた大域計画}\label{sec:with2dastar}
+二次元を探索するA*（2D A*）と価値反復を並列に計算し，
+A*の計算結果を価値反復に適用する．
 既存の価値反復と
 並行でA*探索を実行し，図\ref{fig:propose}のように，
 A*の見つけた経路沿いに
@@ -59,7 +60,7 @@ $V$の勾配が思わぬ方向に傾くような悪影響が考えられる．
 \end{figure}
 
 
-\section{3D A*の適用}\label{sec:with3dastar}
+\section{価値反復と3D A*を組み合わせた大域計画}\label{sec:with3dastar}
 そこで，価値反復と同じ探索空間を持つA*（3D A*）を用いて
 経路を算出し，用いる手法を提案する．
 グリッドに加え，角度の方向にも離散化し，
