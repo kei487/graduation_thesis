@@ -45,7 +45,7 @@ $xy\theta$空間内の領域として扱われる．
 価値反復ROSパッケージは既存の機能で対処可能である．
 本研究では，局所経路計画である未知障害物の回避も取り扱わない．
 
-\subsection{マルコフ決定過程（Markov Decision Process: MDP）による定式化}
+\subsection{マルコフ決定過程（\underline{M}arkov \underline{d}ecision \underline{p}rocess: MDP）による定式化}
 
 この環境をMDPという枠組みで定式化する．
 MDPは，エージェント（ここでは，移動ロボット）が環境と相互作用しながら
@@ -64,7 +64,7 @@ $\langle \mathcal{S}, \mathcal{A}, P, R \rangle$
 メンテナスしてから動かした時間などを追加する必要がある．
 
 \begin{enumerate}
-    \item \textbf{状態空間 $\mathcal{S}$ (State Space)}:
+    \item \textbf{状態空間 $\mathcal{S}$ (\underline{s}tate space)}:
     ロボットが取り得るすべての状態の集合．
 	\ref{sec:prob_def}節で述べたように，ロボットは，
 	位置$(x, y)$ とロボットの方位$\theta$を持つ．これらを合わせた
@@ -75,14 +75,15 @@ $\langle \mathcal{S}, \mathcal{A}, P, R \rangle$
 % 	固定障害物に接触している状態なども含まれる．
 %そうだけど定式化で混乱しそう．
 
-    \item \textbf{行動の集合 $\mathcal{A}$ (Action Space)}:
+    \item \textbf{行動の集合 $\mathcal{A}$ (\underline{a}ction space)}:
     各状態でロボットが選択可能な行動の集合．
-	価値反復ROSパッケージでは，速度$v[m/s]$@@@単位はイタリックにしないこと@@@と角速度$\omega [rad/s]$の組で表される．
+	価値反復ROSパッケージでは，速度$v$[m/s]%@@@単位はイタリックにしないこと@@@
+	と角速度$\omega$ [rad/s]の組で表される．
 	例えば直進とカーブの行動の組は，
 	$a = (v, \omega)^T = (0.3, 0)^T, (0.2, 0.1)^T \in \mathcal{A}$と表される．
 %@@@単位は前が数字の場合はカッコでかこまないそうです. あと, ブロック体です. $0.3$[m/s]が正解@@@
 
-    \item \textbf{状態遷移モデル $P(s' | a, s)$ (Transition Probability)}:
+    \item \textbf{状態遷移モデル $P(s' | a, s)$ (transition \underline{p}robability)}:
     状態 $s$ で行動 $a$ を選択したときに，次の時刻に状態 $s'$ へ遷移する確率．
 	\begin{equation}
         	P(s' | a, s) = \Pr\{S_{t+1}=s' | S_t=s, A_t=a\}
@@ -94,7 +95,7 @@ $\langle \mathcal{S}, \mathcal{A}, P, R \rangle$
 	例えば，「前進」を選択しても，10\%の確率で左右のセルに移動し，
 	5\%で行き過ぎて奥のセルに移動する，といった表現が可能である．
 
-    \item \textbf{報酬モデル $R(s, a, s')$ (Reward Function)}:
+    \item \textbf{報酬モデル $R(s, a, s')$ (\underline{r}eward function)}:
 %@@@これも$\mathcal{R}_{ss'}^a$か$R(s, a, s')$@@@
     状態遷移に伴って得られる評価でスカラで表される．
 	経路計画問題においては，コストの最小化または負の報酬の最大化として定式化される．
@@ -107,7 +108,7 @@ $\langle \mathcal{S}, \mathcal{A}, P, R \rangle$
 
 \subsubsection{ベルマン方程式と価値関数}
 MDPの目的は，各状態でどのような行動をとるべきかというルール，
-すなわち方策（Policy） 
+すなわち方策（\underline{p}olicy） 
 \begin{equation}
 \pi: \mathcal{S} \to \mathcal{A}
 \end{equation}
@@ -119,10 +120,10 @@ V: \mathcal{S} \to \mathbb{R}
 を導入する．
 状態価値関数は
 \begin{equation}
-    V(s) = \bigg\langle R(s, a, s') + V(s') \bigg\rangle_{P(s'| a, s)}
+    V(s) \leftarrow \bigg\langle R(s, a, s') + V(s') \bigg\rangle_{P(s'| a, s)}
   \label{eq:value_func_def}
 \end{equation}
-と計算される．@@@この式は計算の式ではなくて釣り合いの式です（$\leftarrow$とか$:=$を使う）@@@
+と計算される．%@@@この式は計算の式ではなくて釣り合いの式です（$\leftarrow$とか$:=$を使う）@@@
 また，$V$は，終端状態$s \in S_f$に対しては，0に，
 それ以外の$s$に対しては，無限大（実装上は大きい定数）に初期化される．
 これにより，$V$は，ある状態 $s$ で，行動$a$をとったときに
@@ -130,14 +131,18 @@ V: \mathcal{S} \to \mathbb{R}
 
 方策のうち$V$を最小化するものを最適方策 $\pi^*$ と呼び，
 $\pi^*$ に従ったときの価値関数を最適状態価値関数 $V^*(s)$ と呼ぶ．
-$V^*(s)$ は，ベルマン方程式（Bellman Equation）
-@@@さっきから固有名詞でないものまでキャピタライズしているのがすごく気になります. 略語の説明とかは\underline{e}quationみたいにアンダーラインを使う@@@
+$V^*(s)$ は，ベルマン方程式
+%@@@さっきから固有名詞でないものまでキャピタライズしているのがすごく気になります. 略語の説明とかは\underline{e}quationみたいにアンダーラインを使う@@@
 \begin{equation}
-    V^*(s) = \max_{a \in \mathcal{A}} \sum_{s' \in \mathcal{S}} 
-	\mathcal{P}(s'| a, s) \left[ \mathcal{R}(s, a, s') + V^*(s') \right]
+    V^*(s) = \min_{a \in \mathcal{A}} 
+    \bigg\langle R(s, a, s') + V^*(s') \bigg\rangle_{P(s'| a, s)}
+% 	\sum_{s' \in \mathcal{S}} 
+% 	P(s'| a, s) \left[ R(s, a, s') + V^*(s') \right]
     \label{eq:bellman_formula2}
 \end{equation}
-を満たす．@@@mathcalこれまで使ってないです. あと, 上で期待値の形式で説明しているのに, こちらでは$\sum$を使ってるのも気になります. @@@
+を満たす．
+%ここは離散状態について言及していないから期待値の方が良い
+%@@@mathcalこれまで使ってないです. あと, 上で期待値の形式で説明しているのに, こちらでは$\sum$を使ってるのも気になります. @@@
 ベルマン方程式は再帰的な構造をしており，
 ある状態の価値は，そこで最適な行動をとった際に期待される即時報酬と，
 遷移先の状態の価値の和によって決まることを意味している．
@@ -146,7 +151,8 @@ $V^*(s)$ は，ベルマン方程式（Bellman Equation）
 
 
 \section{価値反復アルゴリズムによる経路計画}
-経路計画を行う際にはMDPを有限マルコフ決定仮定@@@過程@@@（finite MDP）
+経路計画を行う際にはMDPを有限マルコフ決定過程（finite MDP）
+%@@@過程@@@
 として，計算を行う．
 状態$s \in \mathcal{S}$は，
 ロボットの位置・向きの
@@ -156,7 +162,10 @@ $xy\theta$空間を格子状に離散化して
 そこから目的地までのコストを計算した
 $V(s)$が計算される．
 
-ベルマン最適方程式 (\ref{eq:bellman_formula2}) を用いて，
+$s$を離散化したため，
+期待値の形式で示した
+ベルマン方程式 (\ref{eq:bellman_formula2}) 
+を総和の形式に変換したものを用いて，
 反復計算により $V^*(s)$ を求める．
 詳細な計算とアルゴリズムの手順は以下の通りである．
 
