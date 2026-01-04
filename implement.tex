@@ -69,19 +69,26 @@ A*で算出した経路上で，式（\ref{eq:propose}）
 
 \subsubsection{2D A*の暫定経路の適用}
 2D A*が出力する経路$p_i$（$i \in \mathbb N $）は$XY$平面上のものであり，
+% iの情報これで足りてる？足りていない気がする
 $\theta$方向の情報がない．
 つまり，$p_i = (x_i \; \:  y_i)^T$と表せ，
 式(\ref{eq:propose})上の$f$は，この経路の集合$p_i \in P$
 に対して実数を返す関数と解釈できる．
-よって，式（\ref{eq:propose}）を$\theta$全体の集合$\Theta \subset S$を用いて
+よって，式（\ref{eq:propose}）を$ s_{p_i} \in \mathcal{S}$を用いて
 \begin{align}
-	V ( \begin{pmatrix} x_i \\ y_i \\ \theta\end{pmatrix} 
-		| \theta \in \Theta)
-	 	\longleftarrow K f ( \begin{pmatrix} x_i \\ y_i \end{pmatrix} )
+	V \left ( s_{p_i} \right)
+	 	\longleftarrow K f \left ( p_i \right )
 	\label{eq:propose2d}
 \end{align}
-@@@$V$のかっこが中のベクトルのかっこより小さくて細いです. 行列やベクトルは他の記号で置き換える. @@@
-と実装した．$XY$平面上で同じ位置にある
+と実装した．
+ここで，$ s_{p_i} $は，
+$\theta$全体の集合$\Theta \subset \mathcal{S}$を用いて
+\begin{align}
+	\forall \theta \in \Theta , s_{p_i} = \begin{pmatrix} x_i \\ y_i \\ \theta \end{pmatrix} 
+\end{align}
+に従う．つまり
+%@@@$V$のかっこが中のベクトルのかっこより小さくて細いです. 行列やベクトルは他の記号で置き換える. @@@
+$XY$平面上で同じ位置にある
 離散状態にはすべて同じ値を代入する．
 $\theta$方向の$V$の値は，
 すべて同じであるが，
@@ -90,7 +97,6 @@ $\theta$方向の$V$の値は，
 異なる値を代入してしまっている．
 これにより，通常起き得ない$V$の値の遷移によって
 移動に対して悪影響がでると考えられる．
-%式もっかい出したり図入れたり
 
 \subsubsection{3D A*の暫定経路の適用}
 3D A*が出力する経路$p_i$は，$XY\theta$空間上のものであるため，
@@ -98,8 +104,8 @@ $p_i = (x_i \; \:  y_i \;\: \theta_i )^T$と表せる．
 このとき$f$の引数と$V$の引数が一致する．
 そのため，
 \begin{align}
-	V ( \begin{pmatrix} x_i \\ y_i \\ \theta_i \end{pmatrix} )
-	 	\longleftarrow K f ( \begin{pmatrix} x_i \\ y_i \\ \theta_i \end{pmatrix} )
+	V \left ( p_i \right )
+	 	\longleftarrow K f \left ( p_i \right )
 	\label{eq:propose3d}
 \end{align}
 と実装した．
