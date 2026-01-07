@@ -1,6 +1,6 @@
 \section{従来研究}\label{sec:previous_research}
 %探索ベース（Dijkstra，A*，RRT）→ ポテンシャル法（人工ポテンシャル法→ NavigationFunction）→ 価値反復
-移動ロボットの経路計画は，動的計画法\cite{Bellman1957}に該当し，
+移動ロボットの経路計画は，動的計画法（dynamic programming）\cite{Bellman1957}に該当し，
 ロボットの位置と移動の表現に関して決定論的なアプローチと，確率的なアプローチ
 に大別できる．
 決定論的なアプローチでは，ロボットの位置は，座標で表され，
@@ -273,14 +273,14 @@ MDPでは，「行動 $a$ を行った結果，確率的に状態 $s'$ へ遷移
 
 価値反復ROSパッケージは，MDPを近似した有限マルコフ決定過程（finite MDP）を解く\cite{上田2019詳解}．
 finite MDPでは，$\mathcal{A}, \mathcal{S}$が離散化され，有限の数の要素を持つ集合となる．
-解くというのは，方策
+解くというのは，方策（\underline{p}olicy）
 \begin{equation}
     \pi : \mathcal{S} \to \mathcal{A} 
     \label{eq:define_pi}
 \end{equation}
 を求めることである．
 また，$\pi$を計算するために，
-状態に対して値を対応付けた状態価値関数
+状態に対して値を対応付けた状態価値関数（state \underline{v}alue function）
 \begin{equation}
     V : \mathcal{S} \to \mathbb{R}
     \label{eq:define_v}
