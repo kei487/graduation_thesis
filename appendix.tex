@@ -1,13 +1,113 @@
-\chapter{pure pursuit}
+\chapter{pure pursuitによる経路追従}
 
-\section{原理}
-pure pursuitは，経路追従を行うアルゴリズムである．
-グラフ探索手法と組み合わせることで，大域経路計画を行うことができる．
-pure pursuitは，とても簡素なアルゴリズムで，実装が簡単であるという利点がある．
+\section{概要}
+pure pursuitは，経路追従を行うアルゴリズムの1つである．
+ロボットが現在の位置から経路上の目標点（look-ahead point）へ向かって, 
+一定の曲率を持つ円弧軌道を描くように制御することで経路を追従する．
+グラフ探索手法と組み合わせることで，大域経路計画を行うことができ，
+簡単に実装できるという利点がある．
+
+\section{導出}
+まず，本研究で使用する差動駆動方式のロボットの運動モデルを考える．
+グローバル座標系 $\Sigma_G$ におけるロボットの位置および姿勢を $p = [x, y, \theta]^T$ とする. 
+ロボットの制御入力として並進速度 $v$ および旋回角速度 $\omega$ を与えた場合, 
+その運動方程式は
+\begin{equation}
+\dot{p}
+=
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{\theta}
+\end{bmatrix}
+=
+\begin{bmatrix}
+v \cos \theta \\
+v \sin \theta \\
+\omega
+\end{bmatrix}
+\label{eq:diff_kinematics}
+\end{equation}
+と記述される. 
+
+ロボットの旋回中心（左右車輪軸の中点）を基準とし, 現在位置 $p_r = [x_r, y_r, \theta_r]^T$ 
+から経路上の前方距離 $L_d$（\underline{l}ook-ahead \underline{d}istance）
+にある点を目標点 $p_{goal} = [g_x, g_y]^T$ とする. 
+目標点の位置をロボットの進行方向を $x'$ 軸とするローカル座標系$\Sigma_r$へ変換する. 
+ローカル座標系における目標点 $p' = [x', y']^T$ は, 回転行列を用いて
+\begin{equation}
+  \begin{bmatrix}
+    x' \\
+    y'
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    \cos \theta_r & \sin \theta_r \\
+    -\sin \theta_r & \cos \theta_r
+  \end{bmatrix}
+  \begin{bmatrix}
+    g_x - x_r \\
+    g_y - y_r
+  \end{bmatrix}
+  \label{eq:coord_trans}
+\end{equation}
+のように求められる. 
+このとき, ロボットが目標点に到達するために必要な円弧の曲率 $\kappa$ は, 
+幾何学的な関係より
+\begin{equation}
+  \kappa = \frac{2y'}{L_d^2}
+  \label{eq:curvature}
+\end{equation}
+と導出できる．
+差動2輪ロボットにおいて, 旋回角速度 $\omega$ は並進速度 $v$ と
+曲率 $\kappa$ の積（$\omega = v \kappa$）で与えられる. 
+したがって, 式(\ref{eq:curvature})より, 追従に必要な目標角速度 $\omega_{cmd}$ は
+\begin{equation}
+\omega_{cmd} = v \frac{2y'}{L_d^2}
+\label{eq:omega_cmd}
+\end{equation}
+で決定される. 
+ここで, $y'$ はロボットから見た目標点の横偏差を表しており, 
+式(\ref{eq:omega_cmd})は「横偏差に比例して旋回角速度を与える」
+というP制御的な特性を持つことがわかる. 
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.6\linewidth]{example-image-16x9.pdf}
     \caption{how follow the path by pure pursuit}
+\end{figure}
+
+\section{実装}
+実装上では，与えられた経路とロボットの位置に対して，
+目標点を探索し，式（\ref{eq:omega_cmd}）を計算するだけである．
+
+\begin{figure}[h]
+  \label{alg:pure_pursuit}
+  \begin{algorithm}[H]
+    \caption{Pure Pursuit Algorithm for Differential Drive Robot}
+    \begin{algorithmic}
+    \Require Current pose $p_t = (x_t, y_t, \theta_t)$, Target path $\mathcal{P}$, Current velocity $v_t$
+    \Ensure Angular velocity command $\omega_t$
+    
+    \Statex \textbf{Parameters:}
+    \Statex \quad $L_{min}$: Minimum look-ahead distance
+    \Statex \quad $k$: Look-ahead gain
+    
+    \State $L_d \gets \max(k \cdot v_t, L_{min})$ \Comment{Update look-ahead distance}
+    \State $g \gets \Call{SearchTarget}{\mathcal{P}, p_t, L_d}$ \Comment{Find look-ahead point $(g_x, g_y)$}
+    
+    \If{$g$ is not found}
+        \State \Return $0$ \Comment{Stop if no target}
+    \EndIf
+    
+    \State $\alpha \gets \mathrm{atan2}(g_y - y_t, g_x - x_t) - \theta_t$ \Comment{Angle to target}
+    \State $\alpha \gets \Call{NormalizeAngle}{\alpha}$ \Comment{Normalize to $[-\pi, \pi)$}
+    
+    \State $\omega_t \gets v_t \cdot \frac{2 \sin \alpha}{L_d}$ \Comment{Calculate angular velocity}
+    
+    \State \Return $\omega_t$
+    \end{algorithmic}
+  \end{algorithm}
+  \caption{demo code of pure pursuit}
 \end{figure}
 
