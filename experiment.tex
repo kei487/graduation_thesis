@@ -161,8 +161,7 @@ Goal2に迂回が必要となるのは，
 比較するプログラムは，価値反復ROSパッケージ単体（VI），
 2D A*と価値反復ROSパッケージを併用したもの（VI+2D A*），
 3D A*と価値反復ROSパッケージを併用したもの（VI+3D A*）の3つである．
-これとは別に，2D A* の経路をpure pursuitで追従したもので
-%pure pursuitの説明が，ない！
+これとは別に，2D A* の経路をpure pursuit（付録A）で追従したもので
 移動時間を計測し，ロボットが移動するのにかかる時間を計測する．
 
 \section{実験結果}
@@ -191,7 +190,7 @@ VI+2D A*の勾配の作り方が，角度方向はVI
 
 Goal2については，VI+2D A*とVI+3D A*のどちらとも
 VIより大幅に時間がかかった．
-図\ref{fig:result_path}に示すように，
+%図\ref{fig:result_path}に示すように，
 A*は最短の経路を見つけていたが，
 価値反復の計算の途中で$V$の勾配に分岐が生じ，
 ロボットが迷走するという現象が見られた．
@@ -285,12 +284,12 @@ A*探索を定期的に何度も実行する方法が考えられる．
 
 % A*の経路貼る
 % 迷走する様も貼りたい
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
-  \caption{A temporal path from 2D A*}
-  \label{fig:result_path}
-\end{figure}
+% \begin{figure}[htb]
+%   \centering
+%   \includegraphics[width=0.8\linewidth]{example-image-16x9.pdf}
+%   \caption{A temporal path from 2D A*}
+%   \label{fig:result_path}
+% \end{figure}
 
 % 実機で実験したい．
 % \section{実機実験}
